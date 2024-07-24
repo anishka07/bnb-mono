@@ -31,7 +31,7 @@ func NewHandlers(r *Repository) {
 func (m *Repository) Home(writer http.ResponseWriter, request *http.Request) {
 	remoteIP := request.RemoteAddr
 	m.App.Session.Put(request.Context(), "remote_ip", remoteIP)
-	render.Templates(writer, "home.page.tmpl", &models.DataModel{})
+	render.Templates(writer, "home.page.gohtml", &models.DataModel{})
 }
 
 func (m *Repository) About(writer http.ResponseWriter, request *http.Request) {
@@ -42,25 +42,25 @@ func (m *Repository) About(writer http.ResponseWriter, request *http.Request) {
 	data := &models.DataModel{
 		StringMap: stringMap,
 	}
-	render.Templates(writer, "about.page.tmpl", data)
+	render.Templates(writer, "about.page.gohtml", data)
 }
 
 func (m *Repository) Reservation(writer http.ResponseWriter, request *http.Request) {
-	render.Templates(writer, "make-reservation.page.tmpl", &models.DataModel{})
+	render.Templates(writer, "make-reservation.page.gohtml", &models.DataModel{})
 }
 
 func (m *Repository) Generals(writer http.ResponseWriter, request *http.Request) {
-	render.Templates(writer, "generals.page.tmpl", &models.DataModel{})
+	render.Templates(writer, "generals.page.gohtml", &models.DataModel{})
 }
 
 func (m *Repository) Majors(writer http.ResponseWriter, request *http.Request) {
-	render.Templates(writer, "majors.page.tmpl", &models.DataModel{})
+	render.Templates(writer, "majors.page.gohtml", &models.DataModel{})
 }
 
 func (m *Repository) SearchAvailability(writer http.ResponseWriter, request *http.Request) {
-	render.Templates(writer, "search-availability.page.tmpl", &models.DataModel{})
+	render.Templates(writer, "search-availability.page.gohtml", &models.DataModel{})
 }
 
 func (m *Repository) Contact(writer http.ResponseWriter, request *http.Request) {
-	render.Templates(writer, "contact.page.tmpl", &models.DataModel{})
+	render.Templates(writer, "contact.page.gohtml", &models.DataModel{})
 }
