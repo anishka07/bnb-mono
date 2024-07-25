@@ -2,8 +2,9 @@ package render
 
 import (
 	"bytes"
-	"github.com/anishka07/bnbmono/pkg/config"
-	"github.com/anishka07/bnbmono/pkg/models"
+	"github.com/anishka07/bnbmono/internal/config"
+	"github.com/anishka07/bnbmono/internal/models"
+	"github.com/justinas/nosurf"
 	"html/template"
 	"log"
 	"net/http"
@@ -22,7 +23,8 @@ func NewTemplates(a *config.AppConfig) {
 	app = a
 }
 
-func AddDefaultData(td *models.DataModel) *models.DataModel {
+func AddDefaultData(td *models.DataModel, r *http.Request) *models.DataModel {
+	td.CSRFToken = nosurf.Token(r)
 	return td
 }
 
@@ -30,7 +32,7 @@ func CreateTemplateCache() (map[string]*template.Template, error) {
 	mu.Lock()
 	defer mu.Unlock()
 
-	pages, err := filepath.Glob("templates/*.page.tmpl")
+	pages, err := filepath.Glob("templates/*.page.gohtml")
 	if err != nil {
 		return TemplateCache, err
 	}
@@ -41,13 +43,13 @@ func CreateTemplateCache() (map[string]*template.Template, error) {
 			return TemplateCache, err
 		}
 
-		matches, err := filepath.Glob("templates/*.layout.tmpl")
+		matches, err := filepath.Glob("templates/*.layout.gohtml")
 		if err != nil {
 			return TemplateCache, err
 		}
 
 		if len(matches) > 0 {
-			t, err = t.ParseGlob("templates/*layout.tmpl")
+			t, err = t.ParseGlob("templates/*layout.gohtml")
 			if err != nil {
 				return TemplateCache, err
 			}
@@ -57,7 +59,7 @@ func CreateTemplateCache() (map[string]*template.Template, error) {
 	return TemplateCache, err
 }
 
-func Templates(w http.ResponseWriter, tmpl string, td *models.DataModel) {
+func Templates(w http.ResponseWriter, r *http.Request, tmpl string, td *models.DataModel) {
 	var tc map[string]*template.Template
 	if app.UseCache {
 		tc = app.TemplateCache
@@ -69,7 +71,7 @@ func Templates(w http.ResponseWriter, tmpl string, td *models.DataModel) {
 		log.Fatal("Could not get template from template cache.")
 	}
 	buf := new(bytes.Buffer)
-	td = AddDefaultData(td)
+	td = AddDefaultData(td, r)
 	err := t.Execute(buf, td)
 	if err != nil {
 		log.Fatal(err)

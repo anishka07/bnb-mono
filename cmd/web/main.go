@@ -2,9 +2,9 @@ package main
 
 import (
 	"github.com/alexedwards/scs/v2"
-	"github.com/anishka07/bnbmono/pkg/config"
-	"github.com/anishka07/bnbmono/pkg/handlers"
-	"github.com/anishka07/bnbmono/pkg/render"
+	"github.com/anishka07/bnbmono/internal/config"
+	"github.com/anishka07/bnbmono/internal/handlers"
+	"github.com/anishka07/bnbmono/internal/render"
 	"log"
 	"net/http"
 	"time"
@@ -32,7 +32,7 @@ func main() {
 		log.Fatal(err)
 	}
 	app.TemplateCache = tc
-	app.UseCache = true
+	app.UseCache = false
 
 	repo := handlers.NewRepo(&app)
 	handlers.NewHandlers(repo)

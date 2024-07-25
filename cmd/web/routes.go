@@ -1,11 +1,11 @@
 package main
 
 import (
-	"github.com/anishka07/bnbmono/pkg/config"
+	"github.com/anishka07/bnbmono/internal/config"
+	"github.com/anishka07/bnbmono/internal/handlers"
 	"github.com/go-chi/chi/v5/middleware"
 	"net/http"
 
-	"github.com/anishka07/bnbmono/pkg/handlers"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -19,7 +19,11 @@ func routes(app *config.AppConfig) http.Handler {
 	mux.Get("/make-reservations", handlers.Repo.Reservation)
 	mux.Get("/generals-quarters", handlers.Repo.Generals)
 	mux.Get("/majors-suite", handlers.Repo.Majors)
+
+	mux.Post("/search-availability-json", handlers.Repo.AvailabilityJson)
 	mux.Get("/search-availability", handlers.Repo.SearchAvailability)
+	mux.Post("/search-availability", handlers.Repo.PostAvailability)
+
 	mux.Get("/about", handlers.Repo.About)
 	mux.Get("/contact", handlers.Repo.Contact)
 
