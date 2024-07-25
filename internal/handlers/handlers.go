@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/anishka07/bnbmono/internal/config"
+	"github.com/anishka07/bnbmono/internal/forms"
 	"github.com/anishka07/bnbmono/internal/models"
 	"github.com/anishka07/bnbmono/internal/render"
 	"log"
@@ -30,44 +31,75 @@ func NewHandlers(r *Repository) {
 	Repo = r
 }
 
-func (m *Repository) Home(writer http.ResponseWriter, request *http.Request) {
-	remoteIP := request.RemoteAddr
-	m.App.Session.Put(request.Context(), "remote_ip", remoteIP)
-	render.Templates(writer, request, "home.page.gohtml", &models.DataModel{})
+func (m *Repository) Home(w http.ResponseWriter, r *http.Request) {
+	remoteIP := r.RemoteAddr
+	m.App.Session.Put(r.Context(), "remote_ip", remoteIP)
+	render.Templates(w, r, "home.page.gohtml", &models.TemplateData{})
 }
 
-func (m *Repository) About(writer http.ResponseWriter, request *http.Request) {
+func (m *Repository) About(w http.ResponseWriter, r *http.Request) {
 	stringMap := make(map[string]string)
 	stringMap["test"] = "Anishka Mukherjee"
-	remoteIP := m.App.Session.GetString(request.Context(), "remote_ip")
+	remoteIP := m.App.Session.GetString(r.Context(), "remote_ip")
 	stringMap["remote_ip"] = remoteIP
-	data := &models.DataModel{
+	data := &models.TemplateData{
 		StringMap: stringMap,
 	}
-	render.Templates(writer, request, "about.page.gohtml", data)
+	render.Templates(w, r, "about.page.gohtml", data)
 }
 
-func (m *Repository) Reservation(writer http.ResponseWriter, request *http.Request) {
-	render.Templates(writer, request, "make-reservation.page.gohtml", &models.DataModel{})
+func (m *Repository) Reservation(w http.ResponseWriter, r *http.Request) {
+	render.Templates(w, r, "make-reservation.page.gohtml", &models.TemplateData{
+		Form: forms.New(nil),
+	})
 }
 
-func (m *Repository) Generals(writer http.ResponseWriter, request *http.Request) {
-	render.Templates(writer, request, "generals.page.gohtml", &models.DataModel{})
+func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	reservation := models.Reservation{
+		FirstName: r.Form.Get("first_name"),
+		LastName:  r.Form.Get("last_name"),
+		Email:     r.Form.Get("email"),
+		Phone:     r.Form.Get("phone"),
+	}
+
+	form := forms.New(r.PostForm)
+	form.Has("first_name", r)
+
+	if !form.Valid() {
+		data := make(map[string]interface{})
+		data["reservation"] = reservation
+
+		render.Templates(w, r, "make-reservation.page.gohtml", &models.TemplateData{
+			Form: form,
+			Data: data,
+		})
+		return
+	}
 }
 
-func (m *Repository) Majors(writer http.ResponseWriter, request *http.Request) {
-	render.Templates(writer, request, "majors.page.gohtml", &models.DataModel{})
+func (m *Repository) Generals(w http.ResponseWriter, r *http.Request) {
+	render.Templates(w, r, "generals.page.gohtml", &models.TemplateData{})
 }
 
-func (m *Repository) SearchAvailability(writer http.ResponseWriter, request *http.Request) {
-	render.Templates(writer, request, "search-availability.page.gohtml", &models.DataModel{})
+func (m *Repository) Majors(w http.ResponseWriter, r *http.Request) {
+	render.Templates(w, r, "majors.page.gohtml", &models.TemplateData{})
 }
 
-func (m *Repository) PostAvailability(writer http.ResponseWriter, request *http.Request) {
-	start := request.Form.Get("start")
-	end := request.Form.Get("end")
+func (m *Repository) SearchAvailability(w http.ResponseWriter, r *http.Request) {
+	render.Templates(w, r, "search-availability.page.gohtml", &models.TemplateData{})
+}
 
-	_, err := writer.Write([]byte(fmt.Sprintf("Start date is %s and end date is %s ", start, end)))
+func (m *Repository) PostAvailability(w http.ResponseWriter, r *http.Request) {
+	start := r.Form.Get("start")
+	end := r.Form.Get("end")
+
+	_, err := w.Write([]byte(fmt.Sprintf("Start date is %s and end date is %s ", start, end)))
 	if err != nil {
 		return
 	}
@@ -95,6 +127,6 @@ func (m *Repository) AvailabilityJson(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (m *Repository) Contact(writer http.ResponseWriter, request *http.Request) {
-	render.Templates(writer, request, "contact.page.gohtml", &models.DataModel{})
+func (m *Repository) Contact(w http.ResponseWriter, r *http.Request) {
+	render.Templates(w, r, "contact.page.gohtml", &models.TemplateData{})
 }

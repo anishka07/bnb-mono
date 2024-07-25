@@ -23,7 +23,7 @@ func NewTemplates(a *config.AppConfig) {
 	app = a
 }
 
-func AddDefaultData(td *models.DataModel, r *http.Request) *models.DataModel {
+func AddDefaultData(td *models.TemplateData, r *http.Request) *models.TemplateData {
 	td.CSRFToken = nosurf.Token(r)
 	return td
 }
@@ -59,7 +59,7 @@ func CreateTemplateCache() (map[string]*template.Template, error) {
 	return TemplateCache, err
 }
 
-func Templates(w http.ResponseWriter, r *http.Request, tmpl string, td *models.DataModel) {
+func Templates(w http.ResponseWriter, r *http.Request, tmpl string, td *models.TemplateData) {
 	var tc map[string]*template.Template
 	if app.UseCache {
 		tc = app.TemplateCache

@@ -1,6 +1,8 @@
 package models
 
-type DataModel struct {
+import "github.com/anishka07/bnbmono/internal/forms"
+
+type TemplateData struct {
 	StringMap map[string]string
 	IntMap    map[string]int
 	FloatMap  map[string]float32
@@ -8,4 +10,5 @@ type DataModel struct {
 	CSRFToken string
 	Warning   string
 	Error     string
+	Form      *forms.Form
 }
